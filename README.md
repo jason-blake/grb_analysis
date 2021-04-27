@@ -1,2 +1,2 @@
-# grb_analysis
-We want to reproduce results related to grb analysis for different types
+# grb190829A
+We want to re-produce results related to grb analysis for different types.
