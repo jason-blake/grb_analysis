@@ -1,2 +1,2 @@
 # grb190829A
-We want to re-produce results related to grb analysis for different types.
+I want to re-produce results from paper 'https://science.sciencemag.org/content/372/6546/1081' related to grb GRB 190829A. I used almost all ideas related to paper and and internal codes. 
