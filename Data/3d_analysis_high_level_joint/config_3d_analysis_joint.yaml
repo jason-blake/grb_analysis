@@ -1,0 +1,38 @@
+general:
+    log: {level: info, filename: null, filemode: null, format: null, datefmt: null}
+    outdir: .
+observations:
+    datastore: $GAMMAPY_DATA/std_ImPACT_fullEnclosure
+    obs_ids: [152900, 152901, 152902, 152903, 152904, 152905, 152906, 152907]
+    obs_file: null
+    obs_cone: {frame: icrs, lon: 44.544 deg, lat: -8.958 deg, radius: 2.5 deg}
+    obs_time: {start: null, stop: null}
+datasets:
+    type: 3d
+    stack: false
+    geom:
+        wcs:
+            skydir: {frame: icrs, lon: 44.544 deg, lat: -8.958 deg}
+            binsize: 0.02 deg
+            fov: {width: 4.0 deg, height: 4.0 deg}
+            binsize_irf: 0.2 deg
+        selection: {offset_max: 2.5 deg}
+        axes:
+            energy: {min: 0.1 TeV, max: 30.0 TeV, nbins: 48}
+            energy_true: {min: 0.05 TeV, max: 30.0 TeV, nbins: 30}
+    map_selection: [counts, exposure, background, psf, edisp]
+    background:
+        method: fov_background
+        exclusion: null
+        parameters: {method: scale}
+    safe_mask:
+        methods: [aeff-default, edisp-bias, offset-max]
+        parameters: {bias_percent: 10, offset_max: 2.5 deg}
+    on_region: {frame: null, lon: null, lat: null, radius: null}
+    containment_correction: true
+fit:
+    fit_range: {min: 0.1 TeV, max: 5.0 TeV}
+flux_points:
+    energy: {min: 0.18 TeV, max: 3.3 TeV, nbins: 10}
+    source: source
+    parameters: {}

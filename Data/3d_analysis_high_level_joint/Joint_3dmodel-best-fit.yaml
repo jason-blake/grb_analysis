@@ -1,0 +1,21 @@
+components:
+-   name: grb190829a
+    type: SkyModel
+    spectral:
+        type: PowerLawSpectralModel
+        parameters:
+        - {name: index, value: 2.4771044325010516, unit: '', min: .nan, max: .nan,
+            frozen: false, error: 0.08903127803287775}
+        - {name: amplitude, value: 1.4541891719963783e-11, unit: cm-2 s-1 TeV-1, min: .nan,
+            max: .nan, frozen: false, error: 9.702855298815785e-13}
+        - {name: reference, value: 0.556, unit: TeV, min: .nan, max: .nan, frozen: true,
+            error: 0.0}
+    spatial:
+        type: PointSpatialModel
+        frame: icrs
+        parameters:
+        - {name: lon_0, value: 44.54601726903122, unit: deg, min: .nan, max: .nan,
+            frozen: false, error: 0.002848325105824728}
+        - {name: lat_0, value: -8.962168305615464, unit: deg, min: .nan, max: .nan,
+            frozen: false, error: 0.002913563020661938}
+covariance: ../Data/3d_analysis_high_level_joint/Joint_3dmodel-best-fit_covariance.dat
