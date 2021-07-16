@@ -39,6 +39,8 @@ from gammapy.makers import (
 from gammapy.estimators import FluxPointsEstimator
 from gammapy.visualization import plot_spectrum_datasets_off_regions
 
+import warnings
+warnings.filterwarnings('ignore')
 
 def get_runlist(run_list):
     cluster1 = [152900, 152901]
@@ -77,7 +79,7 @@ def get_runlist(run_list):
             runs = runs_hybrid
         return runs
 
-work_dir = "/Users/jean/Documents/PhD/gammapy/GRBs/190829A/v17/new_analysis/grb_analysis/_scripts/"
+work_dir = "/Users/jean/Documents/PhD/gammapy/GRBs/190829A/v17/new_analysis/grb_analysis/"
 pathdata = '$GAMMAPY_DATA/std_ImPACT_fullEnclosure'
 def load_data(runs):
     # Load FITS data from H.E.S.S database/local cpu
@@ -90,7 +92,7 @@ def load_data(runs):
 
 def save(fig, figname, left = 0.15, bottom = 0.15, right = 0.95, top = 0.95):
     fig.subplots_adjust(left = left, bottom = bottom, top = top, right = right)
-    format_fig = ['png','pdf'] # used also this 'eps', but it's heavy 
+    format_fig = ['png','pdf'] # used also this 'eps', but it's heavy
     for form in format_fig:
         fig.savefig(work_dir + "plots/plots_1D/{}/scripts/grb190829A_{}_{}.{}"
                     .format(args.night,args.night, figname, form))
@@ -187,23 +189,30 @@ if __name__ == "__main__":
 
     # Exclusion region
     exclusion_ra = 44.106
-    exclusion_dec = -8.98981
+    exclusion_dec = -8.9891
     exclusion_radius = 0.2
-    exclusion_region = CircleSkyRegion(
+
+    exclusion_region_star = CircleSkyRegion(
     center= SkyCoord(exclusion_ra, exclusion_dec, unit="deg", frame="icrs"),
     radius= exclusion_radius * u.deg,
     )
 
+    exclusion_region_grb = CircleSkyRegion(
+    center=SkyCoord(44.544, -8.958, unit="deg", frame="icrs"),
+    radius=0.3 * u.deg,
+    )
     skydir = target_position.icrs
     exclusion_mask = Map.create(
     npix=(150, 150), binsz=0.02, skydir=skydir, proj="TAN", frame="icrs")
 
-    mask = exclusion_mask.geom.region_mask([exclusion_region], inside=False)
+    mask = exclusion_mask.geom.region_mask( [exclusion_region_grb,exclusion_region_star],
+    inside=False
+    )
     exclusion_mask.data = mask
 
     ## Start binning in energy!
 
-    e_reco = np.logspace(np.log10(args.ethres, np.log10(40), 40) * u.TeV
+    e_reco = np.logspace(-1, np.log10(100), 49) * u.TeV
     e_true = np.logspace(np.log10(0.05), 2, 200) * u.TeV
 
     dataset_maker = SpectrumDatasetMaker(
@@ -254,7 +263,7 @@ if __name__ == "__main__":
     print(
     'Excess Counts: '+'{:.6s}'.format(str(info_table['excess'][-1])) + '\n',
     'On Counts: ' +'{:.6s}'.format( str(info_table['n_on'][-1]))+'\n',
-    'Off Counts: '+'{:.6s}'.format(str( info_table['n_off'][-1])) + '\n', 
+    'Off Counts: '+'{:.6s}'.format(str( info_table['n_off'][-1])) + '\n',
     'Livetime: ' + '{:.6s}'.format(str(info_table['livetime'][-1]/3600)) + '\n',
     'Alpha: ' + '{:.6s}'.format(str(info_table['alpha'][-1])) + '\n',
     'Background: ' + '{:.6s}'.format(str(info_table['background'][-1])) + '\n',
@@ -298,7 +307,7 @@ if __name__ == "__main__":
 
     #Now we create the model with the spectral model we have
 
-    model = SkyModel(spectral_model = spectral_model)
+    model = SkyModel(spectral_model = spectral_model, name='grb')
 
 
     for dataset in datasets:
@@ -316,7 +325,7 @@ if __name__ == "__main__":
         print("\nJoint fit finished:\n")
         print('--------------------------------------\n')
         print(result_joint)
-        result_joint.parameters.to_table().write(work_dir + "../flux_and_fit_results/" + name_file+'_joint_fit_v17.csv', overwrite=True)
+        result_joint.parameters.to_table().write(work_dir + "/flux_and_fit_results/" + name_file+'_joint_fit_v17.csv', overwrite=True)
         print (result_joint.parameters.to_table())
         print("CSV file with table saved.")
 
@@ -333,16 +342,19 @@ if __name__ == "__main__":
         model_best_stacked = model.copy()
         print("\nStacked fit finished:\n")
         print(result_stacked)
-        result_stacked.parameters.to_table().write(work_dir + "../flux_and_fit_results/" + name_file+'_stacked_fit_v17.csv', overwrite=True)
+        result_stacked.parameters.to_table().write(work_dir + "/flux_and_fit_results/" + name_file+'_stacked_fit_v17.csv', overwrite=True)
         print (result_stacked.parameters.to_table())
         print("CSV file with table saved.")
 
 
     # Flix points computation
     # Set binning
-    ebounds = np.logspace(np.log10(args.ethres), np.log10(4), args.nbins)
+    ebounds = np.logspace(np.log10(args.ethres), np.log10(6), args.nbins)
     ebounds = ebounds[ebounds.searchsorted(min_energy.value+1e-4)-1:]
+    print(ebounds)
 
+    #ebounds = np.logspace(-0.75, 0.52, 10)
+    #ebounds = ebounds[ebounds.searchsorted(min_energy.value+1e-4)-1:]
     fpe = FluxPointsEstimator( e_edges = ebounds*u.TeV, reoptimize = True)
 
     with np.errstate(divide='ignore', invalid='ignore'):
@@ -367,10 +379,12 @@ if __name__ == "__main__":
             print('{:^14.3f}|{:^16.4g}|{:^16.4g}|{:^16.4g}|{:^16.2f}'.format(e, f, f-fl, f+fh, s))
 
     if args.fit_type == "joint":
-        print(result_joint.parameters.names)
+        #print(result_joint.parameters.names)
+        print('fit with joint model ...')
 
     if args.fit_type == "stacked":
-        print(result_stacked.parameters.names)
+        #print(result_stacked.parameters.names)
+        print('fit with stacked model ...')
 
 
     flux_points_dataset = FluxPointsDataset(data = flux_points, models = model)
@@ -382,7 +396,7 @@ if __name__ == "__main__":
     flux_points.table["res_errd"] = res_err[0]
     flux_points.table["res_erru"] = res_err[1]
     flux_points.table['is_ul'] = flux_points.table['ts'] < 2 # set threshold to 2 sigma
-    flux_points.write(work_dir + "../flux_and_fit_results/" + name_file+'_flux_points_v17.ecsv',
+    flux_points.write(work_dir + "/flux_and_fit_results/" + name_file+'_flux_points_v17.ecsv',
                       include_names=['e_ref', 'e_min', 'e_max', 'ref_dnde', 'ref_flux', 'ref_eflux', 'ref_e2dnde',
                                     'dnde', 'dnde_err', 'dnde_errp', 'dnde_errn', 'dnde_ul',
                                     'is_ul', 'ts','sqrt_ts',"residuals","res_errd","res_erru"],
@@ -400,14 +414,14 @@ if __name__ == "__main__":
     ax.grid(ls='--')
     plt.ylabel(r'$\rm{E^2 \, NdNdE (erg/(cm^2 \, s))}$', fontsize = 16)
     plt.xlabel('Energy (TeV)', fontsize=16)
-    ax.set_xlim(0.15, 100)
+    ax.set_xlim(0.15, 5)
     #ax.set_ylim(5e-15, 1e-10);
     save(fig, name_file+'_ts_profile_spectrum')
 
     #fig = plt.figure()
 
     plot_kwargs = {
-    "energy_range": [args.ethres, 10] * u.TeV,
+    "energy_range": [args.ethres, 5] * u.TeV,
     "flux_unit": "erg-1 cm-2 s-1",}
 
     if args.fit_type == "joint":
