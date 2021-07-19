@@ -1,0 +1,4 @@
+name,value,unit,min,max,frozen,error
+index,2.485e+00,,nan,nan,False,2.568e-01
+amplitude,2.364e-12,cm-2 s-1 TeV-1,nan,nan,False,5.627e-13
+reference,5.560e-01,TeV,nan,nan,True,0.000e+00
