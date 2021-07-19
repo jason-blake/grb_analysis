@@ -316,7 +316,7 @@ if __name__ == "__main__":
         print('--------------------------\n')
         print(result_joint)
 
-        result_joint.parameters.to_table().write(name_file+'_joint_fit_v15.csv', overwrite=True)
+        result_joint.parameters.to_table().write('../flux_and_fit_results/' + name_file + '_joint_fit_v17.csv', overwrite=True)
         print()
         print (result_joint.parameters.to_table())
         print("CSV file with table saved.")
@@ -341,7 +341,7 @@ if __name__ == "__main__":
 
         print("\nStacked fit finished:\n")
         print(result_stacked)
-        result_stacked.parameters.to_table().write('../Data/flux_and_fit_results/' + name_file+'_stacked_fit_v15.csv', overwrite=True)
+        result_stacked.parameters.to_table().write('../flux_and_fit_results/' + name_file + '_stacked_fit_v17.csv', overwrite=True)
         print (result_stacked.parameters.to_table())
         print("CSV file with table saved.")
         '''
@@ -452,14 +452,14 @@ if __name__ == "__main__":
     flux_points.to_sed_type('e2dnde').plot_ts_profiles(y_unit='TeV cm-2 s-1')
     fig.axes.set_xlim(0.1, 100);
 
-    flux_points.write('../flux_and_fit_results/fitresults_night1_3d_flux_points_v15_scripted.ecsv',
+    flux_points.write('../flux_and_fit_results/fitresults_night1_3d_flux_points_v17_scripted.ecsv',
                   include_names=['e_ref', 'e_min', 'e_max',
                                  'dnde', 'dnde_err', 'dnde_errp', 'dnde_errn', 'dnde_ul',
                                  'is_ul', 'sqrt_ts'],
                   overwrite=True)
 
 
-    result_joint.parameters.to_table().write('../flux_and_fit_results/fitresults_night1_3d_fit15_scripted.csv', overwrite=True)
+    result_joint.parameters.to_table().write('../flux_and_fit_results/fitresults_night1_3d_fit17_scripted.csv', overwrite=True)
 
 
     # Plot results
